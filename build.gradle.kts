@@ -14,6 +14,7 @@ buildscript {
     classpath("com.google.gms:google-services:${versions.googleServices}")
     classpath("com.google.firebase:perf-plugin:${versions.firebasePerformancePlugin}")
     classpath(files("./buildTooling/room-metadata-generator-${versions.roomMetadataGenerator}.jar"))
+    classpath("androidx.benchmark:benchmark-gradle-plugin:${versions.benchmark}")
   }
 }
 
