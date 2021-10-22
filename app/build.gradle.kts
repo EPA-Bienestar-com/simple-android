@@ -144,6 +144,11 @@ android {
 
   buildFeatures {
     viewBinding = true
+    compose = true
+  }
+
+  composeOptions {
+    kotlinCompilerExtensionVersion = libs.versions.compose.get()
   }
 
   flavorDimensions.add("track")
@@ -320,6 +325,8 @@ dependencies {
   kapt(libs.androidx.room.compiler)
 
   implementation(libs.bundles.androidx.work)
+
+  implementation(libs.bundles.compose)
 
   implementation(libs.bundles.moshi)
   kapt(libs.moshi.codegen)
