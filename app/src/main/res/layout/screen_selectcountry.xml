@@ -61,32 +61,6 @@
         android:layout_height="wrap_content" />
 
       <LinearLayout
-        android:id="@+id/countryListContainer_Old"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_gravity="center_horizontal"
-          android:layout_marginTop="@dimen/spacing_24"
-          android:layout_marginBottom="@dimen/spacing_12"
-          android:text="@string/selectcountry_title"
-          android:textAppearance="?attr/textAppearanceHeadline6" />
-
-        <androidx.recyclerview.widget.RecyclerView
-          android:id="@+id/supportedCountriesList"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:clipToPadding="false"
-          android:paddingBottom="@dimen/spacing_8"
-          tools:layout_height="128dp"
-          tools:listitem="@layout/list_selectcountry_country_view" />
-
-      </LinearLayout>
-
-      <LinearLayout
         android:id="@+id/errorContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

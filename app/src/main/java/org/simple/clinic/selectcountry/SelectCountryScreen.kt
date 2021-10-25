@@ -7,13 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.jakewharton.rxbinding3.view.clicks
 import com.spotify.mobius.functions.Consumer
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.cast
-import io.reactivex.rxkotlin.ofType
 import io.reactivex.subjects.PublishSubject
 import kotlinx.parcelize.Parcelize
 import org.simple.clinic.R
@@ -21,19 +19,14 @@ import org.simple.clinic.ReportAnalyticsEvents
 import org.simple.clinic.appconfig.AppConfigRepository
 import org.simple.clinic.appconfig.Country
 import org.simple.clinic.appconfig.displayname.CountryDisplayNameFetcher
-import org.simple.clinic.databinding.ListSelectcountryCountryViewBinding
 import org.simple.clinic.databinding.ScreenSelectcountryBinding
 import org.simple.clinic.di.injector
 import org.simple.clinic.navigation.v2.Router
 import org.simple.clinic.navigation.v2.ScreenKey
 import org.simple.clinic.navigation.v2.fragments.BaseScreen
-import org.simple.clinic.selectcountry.adapter.Event
-import org.simple.clinic.selectcountry.adapter.SelectableCountryItem
-import org.simple.clinic.selectcountry.adapter.SelectableCountryItemDiffCallback
 import org.simple.clinic.selectstate.SelectStateScreen
 import org.simple.clinic.util.scheduler.SchedulersProvider
 import org.simple.clinic.util.unsafeLazy
-import org.simple.clinic.widgets.ItemAdapter
 import org.simple.clinic.widgets.indexOfChildId
 import javax.inject.Inject
 
@@ -69,23 +62,11 @@ class SelectCountryScreen : BaseScreen<
   private val countryListContainer
     get() = binding.countryListContainer
 
-  private val supportedCountriesList
-    get() = binding.supportedCountriesList
-
   private val tryAgain
     get() = binding.tryAgain
 
   private val errorMessageTextView
     get() = binding.errorMessageTextView
-
-  private val supportedCountriesAdapter = ItemAdapter(
-      diffCallback = SelectableCountryItemDiffCallback(),
-      bindings = mapOf(
-          R.layout.list_selectcountry_country_view to { layoutInflater, parent ->
-            ListSelectcountryCountryViewBinding.inflate(layoutInflater, parent, false)
-          }
-      )
-  )
 
   private val hotEvents = PublishSubject.create<SelectCountryEvent>()
 
@@ -94,7 +75,7 @@ class SelectCountryScreen : BaseScreen<
   }
 
   private val countryListViewIndex: Int by unsafeLazy {
-    countrySelectionViewFlipper.indexOfChildId(R.id.countryListContainer_Old)
+    countrySelectionViewFlipper.indexOfChildId(R.id.countryListContainer)
   }
 
   private val errorViewIndex: Int by unsafeLazy {
@@ -110,7 +91,6 @@ class SelectCountryScreen : BaseScreen<
   override fun events() = Observable
       .merge(
           retryClicks(),
-          countrySelectionChanges(),
           hotEvents
       )
       .compose(ReportAnalyticsEvents())
@@ -136,7 +116,6 @@ class SelectCountryScreen : BaseScreen<
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    setupCountriesList()
     setupCountriesListContainer()
   }
 
@@ -156,21 +135,6 @@ class SelectCountryScreen : BaseScreen<
     }
   }
 
-  private fun setupCountriesList() {
-    supportedCountriesList.apply {
-      setHasFixedSize(false)
-      layoutManager = LinearLayoutManager(context)
-      adapter = supportedCountriesAdapter
-    }
-  }
-
-  private fun countrySelectionChanges(): Observable<CountryChosen> {
-    return supportedCountriesAdapter
-        .itemEvents
-        .ofType<Event.CountryClicked>()
-        .map { CountryChosen(it.country) }
-  }
-
   private fun retryClicks(): Observable<RetryClicked> {
     return tryAgain
         .clicks()
@@ -182,7 +146,6 @@ class SelectCountryScreen : BaseScreen<
   }
 
   override fun displaySupportedCountries(countries: List<Country>, chosenCountry: Country?) {
-    supportedCountriesAdapter.submitList(SelectableCountryItem.from(countries, chosenCountry, countryDisplayNameFetcher))
     countrySelectionViewFlipper.displayedChild = countryListViewIndex
   }
 
