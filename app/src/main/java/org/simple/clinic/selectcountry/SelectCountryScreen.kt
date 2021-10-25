@@ -6,12 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.composethemeadapter.MdcTheme
 import com.jakewharton.rxbinding3.view.clicks
 import com.spotify.mobius.functions.Consumer
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.cast
 import io.reactivex.rxkotlin.ofType
+import io.reactivex.subjects.PublishSubject
 import kotlinx.parcelize.Parcelize
 import org.simple.clinic.R
 import org.simple.clinic.ReportAnalyticsEvents
@@ -63,6 +66,9 @@ class SelectCountryScreen : BaseScreen<
   private val countrySelectionViewFlipper
     get() = binding.countrySelectionViewFlipper
 
+  private val countryListContainer
+    get() = binding.countryListContainer
+
   private val supportedCountriesList
     get() = binding.supportedCountriesList
 
@@ -80,6 +86,8 @@ class SelectCountryScreen : BaseScreen<
           }
       )
   )
+
+  private val hotEvents = PublishSubject.create<SelectCountryEvent>()
 
   private val progressBarViewIndex: Int by unsafeLazy {
     countrySelectionViewFlipper.indexOfChildId(R.id.progressBar)
@@ -102,7 +110,8 @@ class SelectCountryScreen : BaseScreen<
   override fun events() = Observable
       .merge(
           retryClicks(),
-          countrySelectionChanges()
+          countrySelectionChanges(),
+          hotEvents
       )
       .compose(ReportAnalyticsEvents())
       .cast<SelectCountryEvent>()
@@ -128,6 +137,23 @@ class SelectCountryScreen : BaseScreen<
     super.onViewCreated(view, savedInstanceState)
 
     setupCountriesList()
+    setupCountriesListContainer()
+  }
+
+  private fun setupCountriesListContainer() {
+    countryListContainer.setContent {
+      MdcTheme {
+        val model by modelUpdatesAsState()
+
+        CountriesListContainer(
+            countries = model.countries.orEmpty(),
+            chosenCountry = model.selectedCountry,
+            onCountrySelected = { country ->
+              hotEvents.onNext(CountryChosen(country))
+            }
+        )
+      }
+    }
   }
 
   private fun setupCountriesList() {
