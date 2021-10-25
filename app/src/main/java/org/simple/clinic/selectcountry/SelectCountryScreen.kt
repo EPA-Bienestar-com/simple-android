@@ -86,7 +86,7 @@ class SelectCountryScreen : BaseScreen<
   }
 
   private val countryListViewIndex: Int by unsafeLazy {
-    countrySelectionViewFlipper.indexOfChildId(R.id.countryListContainer)
+    countrySelectionViewFlipper.indexOfChildId(R.id.countryListContainer_Old)
   }
 
   private val errorViewIndex: Int by unsafeLazy {
