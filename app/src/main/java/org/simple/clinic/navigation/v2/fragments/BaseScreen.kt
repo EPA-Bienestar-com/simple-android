@@ -5,6 +5,9 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -118,5 +121,10 @@ abstract class BaseScreen<K : ScreenKey, B : ViewBinding, M : Parcelable, E, F, 
     if (::viewModel.isInitialized) {
       outState.putParcelable(KEY_MODEL, viewModel.model)
     }
+  }
+
+  @Composable
+  fun modelUpdatesAsState(): State<M> {
+    return viewModel.models.observeAsState(initial = defaultModel())
   }
 }
