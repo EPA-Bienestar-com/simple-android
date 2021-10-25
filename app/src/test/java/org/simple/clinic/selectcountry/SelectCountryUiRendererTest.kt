@@ -38,7 +38,7 @@ class SelectCountryUiRendererTest {
   }
 
   @Test
-  fun `when the manifest has been fetched, render the list of countries`() {
+  fun `when the manifest has been fetched, then display supported countries`() {
     // given
     val model = defaultModel.manifestFetched(countries)
 
@@ -46,7 +46,7 @@ class SelectCountryUiRendererTest {
     renderer.render(model)
 
     // then
-    verify(ui).displaySupportedCountries(countries, null)
+    verify(ui).displaySupportedCountries()
     verifyNoMoreInteractions(ui)
   }
 

@@ -17,7 +17,6 @@ import kotlinx.parcelize.Parcelize
 import org.simple.clinic.R
 import org.simple.clinic.ReportAnalyticsEvents
 import org.simple.clinic.appconfig.AppConfigRepository
-import org.simple.clinic.appconfig.Country
 import org.simple.clinic.appconfig.displayname.CountryDisplayNameFetcher
 import org.simple.clinic.databinding.ScreenSelectcountryBinding
 import org.simple.clinic.di.injector
@@ -145,7 +144,7 @@ class SelectCountryScreen : BaseScreen<
     countrySelectionViewFlipper.displayedChild = progressBarViewIndex
   }
 
-  override fun displaySupportedCountries(countries: List<Country>, chosenCountry: Country?) {
+  override fun displaySupportedCountries() {
     countrySelectionViewFlipper.displayedChild = countryListViewIndex
   }
 
