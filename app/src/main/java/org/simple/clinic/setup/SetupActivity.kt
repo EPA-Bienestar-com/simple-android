@@ -13,7 +13,6 @@ import org.simple.clinic.BuildConfig
 import org.simple.clinic.ClinicApp
 import org.simple.clinic.R
 import org.simple.clinic.activity.permissions.ActivityPermissionResult
-import org.simple.clinic.activity.placeholder.PlaceholderScreen
 import org.simple.clinic.databinding.ActivitySetupBinding
 import org.simple.clinic.di.InjectorProviderContextWrapper
 import org.simple.clinic.feature.Features
@@ -40,8 +39,6 @@ class SetupActivity : AppCompatActivity(), UiActions {
   @Inject
   lateinit var locale: Locale
 
-  private lateinit var component: SetupActivityComponent
-
   @Inject
   lateinit var effectHandlerFactory: SetupActivityEffectHandler.Factory
 
@@ -54,15 +51,12 @@ class SetupActivity : AppCompatActivity(), UiActions {
   @Inject
   lateinit var features: Features
 
-  private val screenResults = ScreenResultBus()
+  @Inject
+  lateinit var router: Router
 
-  private val router by unsafeLazy {
-    Router(
-        initialScreenKey = PlaceholderScreen.Key(),
-        fragmentManager = supportFragmentManager,
-        containerId = R.id.screen_host_view
-    )
-  }
+  private lateinit var component: SetupActivityComponent
+
+  private val screenResults = ScreenResultBus()
 
   private val delegate by unsafeLazy {
     MobiusDelegate.forActivity(
@@ -182,9 +176,7 @@ class SetupActivity : AppCompatActivity(), UiActions {
   private fun setupDiGraph() {
     component = ClinicApp.appComponent
         .setupActivityComponent()
-        .create(
-            fragmentManager = supportFragmentManager
-        )
+        .create(fragmentManager = supportFragmentManager)
 
     component.inject(this)
   }
