@@ -183,7 +183,6 @@ class SetupActivity : AppCompatActivity(), UiActions {
     component = ClinicApp.appComponent
         .setupActivityComponent()
         .create(
-            activity = this,
             router = router
         )
 
