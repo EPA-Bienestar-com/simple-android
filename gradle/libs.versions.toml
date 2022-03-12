@@ -189,6 +189,8 @@ benchmark-gradle-plugin = "androidx.benchmark:benchmark-gradle-plugin:1.0.0"
 
 anvil-gradle-plugin = "com.squareup.anvil:gradle-plugin:2.3.11-1-6-10"
 
+javax-inject = "javax.inject:javax.inject:1"
+
 [bundles]
 androidx-camera = ["androidx-camera-core", "androidx-camera-camera2", "androidx-camera-view", "androidx-camera-lifecycle"]
 androidx-paging = ["androidx-paging-common", "androidx-paging-runtime", "androidx-paging-rx2"]
