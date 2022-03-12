@@ -1,5 +1,6 @@
 package org.simple.clinic.setup
 
+import androidx.fragment.app.FragmentManager
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.BindsInstance
 import dagger.Subcomponent
@@ -18,6 +19,7 @@ interface SetupActivityComponent : OnboardingScreen.Injector, SplashScreen.Injec
   @Subcomponent.Factory
   interface Factory {
     fun create(
+        @BindsInstance fragmentManager: FragmentManager,
         @BindsInstance router: Router
     ): SetupActivityComponent
   }
