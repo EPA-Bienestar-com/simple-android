@@ -38,9 +38,6 @@ class OnboardingScreen : BaseScreen<
   @Inject
   lateinit var onboardingEffectHandler: OnboardingEffectHandler.Factory
 
-  @Inject
-  lateinit var activity: AppCompatActivity
-
   private val getStartedButton
     get() = binding.getStartedButton
 
@@ -92,11 +89,11 @@ class OnboardingScreen : BaseScreen<
     // event bus?) and handle the navigation there.
     // TODO(vs): 2019-11-07 Move this to an event that is subscribed in the parent activity
     val intent = AuthenticationActivity
-        .forNewLogin(activity)
+        .forNewLogin(requireActivity())
         .disableAnimations()
 
-    activity.startActivity(intent)
-    activity.finishWithoutAnimations()
+    requireActivity().startActivity(intent)
+    requireActivity().finishWithoutAnimations()
   }
 
   private fun setIntroOneTextView() {
