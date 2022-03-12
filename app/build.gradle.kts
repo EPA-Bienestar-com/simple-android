@@ -401,6 +401,7 @@ dependencies {
   implementation(projects.mobiusBase)
   implementation(projects.simplePlatform)
   implementation(projects.simpleVisuals)
+  implementation(projects.scopes)
 
   /**
    * Unit test dependencies
