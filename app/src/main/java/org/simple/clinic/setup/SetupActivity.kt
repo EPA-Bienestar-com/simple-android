@@ -183,8 +183,7 @@ class SetupActivity : AppCompatActivity(), UiActions {
     component = ClinicApp.appComponent
         .setupActivityComponent()
         .create(
-            fragmentManager = supportFragmentManager,
-            router = router
+            fragmentManager = supportFragmentManager
         )
 
     component.inject(this)
