@@ -13,9 +13,7 @@ import org.simple.clinic.util.preference.getOptional
 import java.time.Instant
 import java.util.Optional
 
-@Module(includes = [
-  SetupActivityConfigModule::class
-])
+@Module
 @ContributesTo(OnboardingScope::class)
 class SetupActivityModule {
 
