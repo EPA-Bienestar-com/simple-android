@@ -2,6 +2,10 @@
 
 ## Next Release
 
+### Internal
+
+- Add a query to check whether the latest BP entry is high for the patient
+
 ### Features
 
 - [In Progress: 17 Mar 2022] Messaging users to remind them to fill out drug stock report each month
