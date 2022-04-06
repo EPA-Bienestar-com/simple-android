@@ -9,6 +9,7 @@
 - Show the clinical decision support banner in summary screen when newest BP entry is high for the patient
 - Hide clinical decision support alert banner when edit medicines are clicked
 - Add feature flag for clinical decision support alerts
+- Update `isNewestBpEntryHigh` query
 
 ### Features
 
