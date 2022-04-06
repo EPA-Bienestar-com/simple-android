@@ -10,6 +10,7 @@
 - Hide clinical decision support alert banner when edit medicines are clicked
 - Add feature flag for clinical decision support alerts
 - Update `isNewestBpEntryHigh` query
+- Add Hindi translations for CDS alert
 
 ### Features
 
