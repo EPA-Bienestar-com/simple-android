@@ -6,6 +6,7 @@
 
 - Add a query to check whether the latest BP entry is high for the patient
 - Load clinical decision support info when the patient summary screen is created
+- Show the clinical decision support banner in summary screen when newest BP entry is high for the patient
 
 ### Features
 
