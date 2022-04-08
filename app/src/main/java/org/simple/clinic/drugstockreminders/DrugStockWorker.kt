@@ -1,10 +1,10 @@
 package org.simple.clinic.drugstockreminders
 
+import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -13,7 +13,6 @@ import androidx.work.RxWorker
 import androidx.work.WorkerParameters
 import com.f2prateek.rx.preferences2.Preference
 import io.reactivex.Single
-import org.simple.clinic.ClinicApp
 import org.simple.clinic.R
 import org.simple.clinic.di.DateFormatter
 import org.simple.clinic.di.DateFormatter.Type.MonthAndYear
@@ -22,16 +21,20 @@ import org.simple.clinic.drugstockreminders.DrugStockReminder.Result.NotFound
 import org.simple.clinic.drugstockreminders.DrugStockReminder.Result.OtherError
 import org.simple.clinic.main.TypedPreference
 import org.simple.clinic.main.TypedPreference.Type.UpdateDrugStockReportsMonth
+import org.simple.clinic.setup.SetupActivity
 import org.simple.clinic.util.UserClock
 import java.time.LocalDate
-import org.simple.clinic.setup.SetupActivity
 import java.time.format.DateTimeFormatter
 import java.util.Optional
 import javax.inject.Inject
 
-class DrugStockWorker(
-    private val context: Context,
-    workerParams: WorkerParameters
+class DrugStockWorker @Inject constructor(
+    private val context: Application,
+    workerParams: WorkerParameters,
+    private val clock: UserClock,
+    private val drugStockReminder: DrugStockReminder,
+    @TypedPreference(UpdateDrugStockReportsMonth) private val updateDrugStockReportsMonth: Preference<Optional<String>>,
+    @DateFormatter(MonthAndYear) private val monthAndYearDateFormatter: DateTimeFormatter
 ) : RxWorker(context, workerParams) {
 
   companion object {
@@ -40,25 +43,7 @@ class DrugStockWorker(
     private const val NOTIFICATION_ID = 6
   }
 
-  @Inject
-  lateinit var clock: UserClock
-
-  @Inject
-  lateinit var drugStockReminder: DrugStockReminder
-
-  @Inject
-  @TypedPreference(UpdateDrugStockReportsMonth)
-  lateinit var updateDrugStockReportsMonth: Preference<Optional<String>>
-
-  @Inject
-  @DateFormatter(MonthAndYear)
-  lateinit var monthAndYearDateFormatter: DateTimeFormatter
-
   private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-  init {
-    ClinicApp.appComponent.inject(this)
-  }
 
   override fun createWork(): Single<Result> {
     createNotificationChannel()
@@ -71,7 +56,8 @@ class DrugStockWorker(
       when (response) {
         is Found -> drugStockReportFound(response.drugStockReminderResponse.month)
         NotFound -> drugStockReportNotFound(formattedDate)
-        OtherError -> { /* no op */ }
+        OtherError -> { /* no op */
+        }
       }
     }
   }

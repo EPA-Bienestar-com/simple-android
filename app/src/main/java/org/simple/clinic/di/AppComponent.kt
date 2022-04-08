@@ -9,7 +9,6 @@ import org.simple.clinic.deeplink.di.DeepLinkComponent
 import org.simple.clinic.di.work.WorkerComponent
 import org.simple.clinic.drugs.selection.dosage.di.DosagePickerSheetComponent
 import org.simple.clinic.drugs.selection.entry.di.CustomPrescriptionEntrySheetComponent
-import org.simple.clinic.drugstockreminders.DrugStockWorker
 import org.simple.clinic.login.OtpSmsReceiver
 import org.simple.clinic.main.TheActivityComponent
 import org.simple.clinic.registerorlogin.AuthenticationActivityComponent
@@ -29,7 +28,6 @@ interface AppComponent {
   fun inject(target: ClinicApp)
   fun inject(target: OtpSmsReceiver)
   fun inject(target: DataSync)
-  fun inject(target: DrugStockWorker)
 
   fun theActivityComponent(): TheActivityComponent.Factory
   fun setupActivityComponent(): SetupActivityComponent.Factory

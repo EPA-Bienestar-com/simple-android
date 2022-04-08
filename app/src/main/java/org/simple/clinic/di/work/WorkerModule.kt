@@ -5,6 +5,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 import org.simple.clinic.appupdate.AppUpdateNotificationWorker
+import org.simple.clinic.drugstockreminders.DrugStockWorker
 import org.simple.clinic.overdue.download.OverdueDownloadWorker
 import org.simple.clinic.remoteconfig.UpdateRemoteConfigWorker
 import org.simple.clinic.sync.SyncWorker
@@ -31,4 +32,9 @@ abstract class WorkerModule {
   @IntoMap
   @WorkerKey(AppUpdateNotificationWorker::class)
   abstract fun bindAppUpdateNotificationWorker(worker: AppUpdateNotificationWorker): RxWorker
+
+  @Binds
+  @IntoMap
+  @WorkerKey(DrugStockWorker::class)
+  abstract fun bindDrugStockWorker(worker: DrugStockWorker): RxWorker
 }
