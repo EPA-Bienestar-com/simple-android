@@ -4,6 +4,7 @@ import androidx.work.RxWorker
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
+import org.simple.clinic.appupdate.AppUpdateNotificationWorker
 import org.simple.clinic.overdue.download.OverdueDownloadWorker
 import org.simple.clinic.remoteconfig.UpdateRemoteConfigWorker
 import org.simple.clinic.sync.SyncWorker
@@ -25,4 +26,9 @@ abstract class WorkerModule {
   @IntoMap
   @WorkerKey(UpdateRemoteConfigWorker::class)
   abstract fun bindUpdateRemoteConfigWorker(worker: UpdateRemoteConfigWorker): RxWorker
+
+  @Binds
+  @IntoMap
+  @WorkerKey(AppUpdateNotificationWorker::class)
+  abstract fun bindAppUpdateNotificationWorker(worker: AppUpdateNotificationWorker): RxWorker
 }

@@ -2,7 +2,6 @@ package org.simple.clinic.di
 
 import dagger.Component
 import org.simple.clinic.ClinicApp
-import org.simple.clinic.appupdate.AppUpdateNotificationWorker
 import org.simple.clinic.bloodsugar.entry.di.BloodSugarEntryComponent
 import org.simple.clinic.bloodsugar.selection.type.di.BloodSugarTypePickerSheetComponent
 import org.simple.clinic.bp.entry.di.BloodPressureEntryComponent
@@ -30,7 +29,6 @@ interface AppComponent {
   fun inject(target: ClinicApp)
   fun inject(target: OtpSmsReceiver)
   fun inject(target: DataSync)
-  fun inject(target: AppUpdateNotificationWorker)
   fun inject(target: DrugStockWorker)
 
   fun theActivityComponent(): TheActivityComponent.Factory

@@ -1,5 +1,6 @@
 package org.simple.clinic.appupdate
 
+import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -13,11 +14,9 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.RxWorker
 import androidx.work.WorkerParameters
-import androidx.work.workDataOf
 import com.f2prateek.rx.preferences2.Preference
 import io.reactivex.Scheduler
 import io.reactivex.Single
-import org.simple.clinic.ClinicApp
 import org.simple.clinic.PLAY_STORE_URL_FOR_SIMPLE
 import org.simple.clinic.R
 import org.simple.clinic.appupdate.AppUpdateNudgePriority.CRITICAL
@@ -37,9 +36,13 @@ import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class AppUpdateNotificationWorker(
-    private val context: Context,
+class AppUpdateNotificationWorker @Inject constructor(
+    private val context: Application,
     workerParams: WorkerParameters,
+    private val checkAppUpdateAvailability: CheckAppUpdateAvailability,
+    private val schedulerProvider: SchedulersProvider,
+    @TypedPreference(IsLightAppUpdateNotificationShown) private val isLightAppUpdateNotificationShown: Preference<Boolean>,
+    @TypedPreference(IsMediumAppUpdateNotificationShown) private val isMediumAppUpdateNotificationShown: Preference<Boolean>
 ) : RxWorker(context, workerParams) {
 
   companion object {
@@ -62,7 +65,7 @@ class AppUpdateNotificationWorker(
           .build()
     }
 
-     private fun notificationScheduledTime(scheduledDateTime: LocalDateTime, currentDateTime: LocalDateTime): LocalDateTime {
+    private fun notificationScheduledTime(scheduledDateTime: LocalDateTime, currentDateTime: LocalDateTime): LocalDateTime {
       return if (scheduledDateTime.isAfter(currentDateTime)) {
         scheduledDateTime.plusDays(1)
       } else {
@@ -72,24 +75,6 @@ class AppUpdateNotificationWorker(
   }
 
   private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-  @Inject
-  lateinit var checkAppUpdateAvailability: CheckAppUpdateAvailability
-
-  @Inject
-  lateinit var schedulerProvider: SchedulersProvider
-
-  @Inject
-  @TypedPreference(IsLightAppUpdateNotificationShown)
-  lateinit var isLightAppUpdateNotificationShown: Preference<Boolean>
-
-  @Inject
-  @TypedPreference(IsMediumAppUpdateNotificationShown)
-  lateinit var isMediumAppUpdateNotificationShown: Preference<Boolean>
-
-  init {
-    ClinicApp.appComponent.inject(this)
-  }
 
   override fun createWork(): Single<Result> {
     createNotificationChannel()
@@ -101,7 +86,8 @@ class AppUpdateNotificationWorker(
           when (result) {
             is ShowAppUpdate -> showAppUpdateNotificationBasedOnThePriority(result)
             is AppUpdateState.AppUpdateStateError -> resetPreferences()
-            DontShowAppUpdate -> { /* no-op */ }
+            DontShowAppUpdate -> { /* no-op */
+            }
           }.exhaustive()
 
           Result.success()
