@@ -21,6 +21,7 @@ import org.simple.clinic.analytics.UpdateAnalyticsUserId
 import org.simple.clinic.crash.CrashBreadcrumbsTimberTree
 import org.simple.clinic.crash.SentryCrashReporterSink
 import org.simple.clinic.di.AppComponent
+import org.simple.clinic.di.work.DaggerWorkerFactory
 import org.simple.clinic.platform.analytics.Analytics
 import org.simple.clinic.platform.analytics.AnalyticsReporter
 import org.simple.clinic.platform.crash.CrashReporter
@@ -33,8 +34,9 @@ import timber.log.Timber
 import java.io.IOException
 import java.net.SocketException
 import javax.inject.Inject
+import androidx.work.Configuration as WorkManagerConfiguration
 
-abstract class ClinicApp : Application(), CameraXConfig.Provider {
+abstract class ClinicApp : Application(), CameraXConfig.Provider, WorkManagerConfiguration.Provider {
 
   companion object {
     lateinit var appComponent: AppComponent
@@ -54,6 +56,9 @@ abstract class ClinicApp : Application(), CameraXConfig.Provider {
 
   @Inject
   lateinit var updateInfrastructureUserDetails: UpdateInfrastructureUserDetails
+
+  @Inject
+  lateinit var workerFactory: DaggerWorkerFactory
 
   protected open val analyticsReporters = emptyList<AnalyticsReporter>()
 
@@ -125,6 +130,13 @@ abstract class ClinicApp : Application(), CameraXConfig.Provider {
 
   override fun getCameraXConfig(): CameraXConfig {
     return Camera2Config.defaultConfig()
+  }
+
+  override fun getWorkManagerConfiguration(): WorkManagerConfiguration {
+    return WorkManagerConfiguration
+        .Builder()
+        .setWorkerFactory(workerFactory)
+        .build()
   }
 
   abstract fun buildDaggerGraph(): AppComponent
