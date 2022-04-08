@@ -1,19 +1,20 @@
 package org.simple.clinic.remoteconfig
 
-import android.content.Context
+import android.app.Application
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
-import androidx.work.Worker
+import androidx.work.RxWorker
 import androidx.work.WorkerParameters
-import org.simple.clinic.ClinicApp
+import io.reactivex.Single
 import org.simple.clinic.platform.crash.CrashReporter
 import javax.inject.Inject
 
-class UpdateRemoteConfigWorker(
-    context: Context,
-    workerParams: WorkerParameters
-) : Worker(context, workerParams) {
+class UpdateRemoteConfigWorker @Inject constructor(
+    context: Application,
+    workerParams: WorkerParameters,
+    private val remoteConfigService: RemoteConfigService
+) : RxWorker(context, workerParams) {
 
   companion object {
     const val REMOTE_CONFIG_SYNC_WORKER = "remote_config_sync_worker"
@@ -31,18 +32,15 @@ class UpdateRemoteConfigWorker(
     }
   }
 
-  @Inject
-  lateinit var remoteConfigService: RemoteConfigService
-
-  override fun doWork(): Result {
-    ClinicApp.appComponent.inject(this)
-
-    return try {
-      remoteConfigService.update()
-      Result.success()
-    } catch (e: Exception) {
-      CrashReporter.report(e)
-      Result.failure()
-    }
+  override fun createWork(): Single<Result> {
+    return Single
+        .create<Result?> {
+          remoteConfigService.update()
+          Result.success()
+        }
+        .doOnError {
+          CrashReporter.report(it)
+          Result.failure()
+        }
   }
 }

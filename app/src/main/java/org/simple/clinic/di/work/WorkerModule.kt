@@ -5,6 +5,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 import org.simple.clinic.overdue.download.OverdueDownloadWorker
+import org.simple.clinic.remoteconfig.UpdateRemoteConfigWorker
 import org.simple.clinic.sync.SyncWorker
 
 @Module
@@ -19,4 +20,9 @@ abstract class WorkerModule {
   @IntoMap
   @WorkerKey(SyncWorker::class)
   abstract fun bindSyncWorker(worker: SyncWorker): RxWorker
+
+  @Binds
+  @IntoMap
+  @WorkerKey(UpdateRemoteConfigWorker::class)
+  abstract fun bindUpdateRemoteConfigWorker(worker: UpdateRemoteConfigWorker): RxWorker
 }

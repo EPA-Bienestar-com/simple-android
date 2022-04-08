@@ -14,7 +14,6 @@ import org.simple.clinic.drugstockreminders.DrugStockWorker
 import org.simple.clinic.login.OtpSmsReceiver
 import org.simple.clinic.main.TheActivityComponent
 import org.simple.clinic.registerorlogin.AuthenticationActivityComponent
-import org.simple.clinic.remoteconfig.UpdateRemoteConfigWorker
 import org.simple.clinic.setup.SetupActivityComponent
 import org.simple.clinic.signature.SignatureComponent
 import org.simple.clinic.summary.teleconsultation.contactdoctor.ContactDoctorComponent
@@ -29,7 +28,6 @@ import javax.inject.Scope
 interface AppComponent {
 
   fun inject(target: ClinicApp)
-  fun inject(target: UpdateRemoteConfigWorker)
   fun inject(target: OtpSmsReceiver)
   fun inject(target: DataSync)
   fun inject(target: AppUpdateNotificationWorker)
