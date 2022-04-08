@@ -4,7 +4,7 @@ import androidx.work.WorkerParameters
 import dagger.BindsInstance
 import dagger.Subcomponent
 
-@Subcomponent
+@Subcomponent(modules = [WorkerModule::class])
 interface WorkerComponent {
 
   @Subcomponent.Factory
