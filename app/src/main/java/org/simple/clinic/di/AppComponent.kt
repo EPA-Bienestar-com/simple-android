@@ -7,6 +7,7 @@ import org.simple.clinic.bloodsugar.entry.di.BloodSugarEntryComponent
 import org.simple.clinic.bloodsugar.selection.type.di.BloodSugarTypePickerSheetComponent
 import org.simple.clinic.bp.entry.di.BloodPressureEntryComponent
 import org.simple.clinic.deeplink.di.DeepLinkComponent
+import org.simple.clinic.di.work.WorkerComponent
 import org.simple.clinic.drugs.selection.dosage.di.DosagePickerSheetComponent
 import org.simple.clinic.drugs.selection.entry.di.CustomPrescriptionEntrySheetComponent
 import org.simple.clinic.drugstockreminders.DrugStockWorker
@@ -52,6 +53,7 @@ interface AppComponent {
   fun contactDoctorComponent(): ContactDoctorComponent.Factory
   fun teleconsultStatusComponent(): TeleconsultStatusComponent.Factory
   fun authenticationActivityComponent(): AuthenticationActivityComponent.Factory
+  fun workerComponent(): WorkerComponent.Factory
 }
 
 @Scope
