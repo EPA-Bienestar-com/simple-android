@@ -28,7 +28,6 @@ import org.simple.clinic.plumbing.infrastructure.UpdateInfrastructureUserDetails
 import org.simple.clinic.remoteconfig.ConfigReader
 import org.simple.clinic.storage.monitoring.DatadogSqlPerformanceReportingSink
 import org.simple.clinic.storage.monitoring.SqlPerformanceReporter
-import org.simple.clinic.util.clamp
 import timber.log.Timber
 import java.io.IOException
 import java.net.SocketException
@@ -91,11 +90,6 @@ abstract class ClinicApp : Application(), CameraXConfig.Provider {
   }
 
   private fun setupApplicationPerformanceMonitoring() {
-    val samplingRate = remoteConfig
-        .double("datadog_sample_rate", 0.0)
-        .toFloat()
-        .clamp(0F, 100F)
-
     val datadogConfig = Configuration
         .Builder(
             logsEnabled = false,
@@ -109,8 +103,8 @@ abstract class ClinicApp : Application(), CameraXConfig.Provider {
             trackArguments = false,
             supportFragmentComponentPredicate = ResolveScreenNamesForDatadog()
         ))
-        .sampleRumSessions(samplingRate = samplingRate)
         .build()
+
     val credentials = Credentials(
         clientToken = BuildConfig.DATADOG_CLIENT_TOKEN,
         envName = BuildConfig.DATADOG_ENVIRONMENT,
