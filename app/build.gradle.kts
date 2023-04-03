@@ -399,6 +399,8 @@ dependencies {
   implementation(libs.play.services.mlkit.barcode)
 
   implementation(libs.rootbeer)
+  implementation(libs.play.integrity)
+  implementation(libs.bitbucket.jose4j)
 
   implementation(libs.rx.android)
   implementation(libs.rx.java)
