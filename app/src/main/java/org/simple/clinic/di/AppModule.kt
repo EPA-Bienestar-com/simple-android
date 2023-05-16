@@ -33,6 +33,7 @@ import org.simple.clinic.plumbing.infrastructure.InfrastructureModule
 import org.simple.clinic.registration.RegistrationModule
 import org.simple.clinic.remoteconfig.RemoteConfigModule
 import org.simple.clinic.remoteconfig.firebase.FirebaseRemoteConfigModule
+import org.simple.clinic.security.CryptoModule
 import org.simple.clinic.security.di.PinVerificationModule
 import org.simple.clinic.security.pin.BruteForceProtectionModule
 import org.simple.clinic.settings.SettingsModule
@@ -96,7 +97,8 @@ import javax.inject.Named
   InfrastructureModule::class,
   AppUpdateModule::class,
   DrugStockReminderApiModule::class,
-  OverdueSearchModule::class
+  OverdueSearchModule::class,
+  CryptoModule::class,
 ])
 class AppModule(private val appContext: Application) {
 

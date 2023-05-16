@@ -404,6 +404,10 @@ dependencies {
   implementation(libs.signaturepad)
 
   implementation(libs.sqlite.android)
+  implementation(libs.database.sqlcipher)
+
+  implementation(libs.security.crypto)
+  implementation(libs.security.crypto.ktx)
 
   implementation(libs.threeten.extra)
 

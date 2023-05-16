@@ -175,6 +175,11 @@ soloader = "com.facebook.soloader:soloader:0.10.5"
 
 sqlite-android = "com.github.requery:sqlite-android:3.39.2"
 
+database-sqlcipher = "net.zetetic:android-database-sqlcipher:4.5.3"
+
+security-crypto = "androidx.security:security-crypto:1.0.0"
+security-crypto-ktx = "androidx.security:security-crypto-ktx:1.1.0-alpha06"
+
 threeten-extra = "org.threeten:threeten-extra:1.7.2"
 
 timber = "com.jakewharton.timber:timber:5.0.1"
