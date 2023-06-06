@@ -8,6 +8,7 @@
 - Bump AGP to v8.0.2
 - Enable auto merging branches for minor renovate dependency updates
 - Use `kotlinOptions#jvmTarget` instead of `kotlin#jvmToolchain` in build files
+- Add rules to prevent Retrofit & GSON types being stripped in R8 full mode
 
 ### Changes
 
