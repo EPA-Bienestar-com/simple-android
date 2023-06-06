@@ -9,6 +9,7 @@
 - Enable auto merging branches for minor renovate dependency updates
 - Use `kotlinOptions#jvmTarget` instead of `kotlin#jvmToolchain` in build files
 - Add rules to prevent Retrofit & GSON types being stripped in R8 full mode
+- Add rule to prevent `SQLiteConnection` type being stripped in R8 full mode
 
 ### Changes
 
