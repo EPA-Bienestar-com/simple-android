@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 111,
-    "identityHash": "5e79f0cbd47e08c9cdd5c8c624f815a2",
+    "identityHash": "a9d32b88cd2ecd4e7e8e157645a78f95",
     "entities": [
       {
         "tableName": "Patient",
@@ -1861,7 +1861,17 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_CallResult_appointmentId",
+            "unique": false,
+            "columnNames": [
+              "appointmentId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_CallResult_appointmentId` ON `${TABLE_NAME}` (`appointmentId`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -2149,7 +2159,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5e79f0cbd47e08c9cdd5c8c624f815a2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a9d32b88cd2ecd4e7e8e157645a78f95')"
     ]
   }
 }
