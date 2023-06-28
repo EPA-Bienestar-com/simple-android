@@ -9,6 +9,6 @@ class SetupActivityInit(
 ) : Init<SetupActivityModel, SetupActivityEffect> {
 
   override fun init(model: SetupActivityModel): First<SetupActivityModel, SetupActivityEffect> {
-    return first(model, if (isDatabaseEncryptionEnabled) ExecuteDatabaseEncryption else CheckIfAppCanRun)
+    return first(model, ExecuteDatabaseEncryptionDecryption(isDatabaseEncryptionEnabled))
   }
 }

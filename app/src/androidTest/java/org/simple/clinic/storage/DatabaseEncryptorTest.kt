@@ -74,7 +74,7 @@ class DatabaseEncryptorTest {
     assertThat(databaseEncryptor.databaseState(DB_NAME)).isEqualTo(UNENCRYPTED)
 
     // when
-    databaseEncryptor.execute(databaseName = DB_NAME)
+    databaseEncryptor.execute(databaseName = DB_NAME, true)
 
     // then
     assertThat(databaseEncryptor.databaseState(DB_NAME)).isEqualTo(ENCRYPTED)
@@ -89,5 +89,55 @@ class DatabaseEncryptorTest {
 
     assertThat(encryptedUser).isNotNull()
     assertThat(encryptedUser).isEqualTo(expectedUser)
+  }
+
+  @Test
+  fun decrypting_existing_encrypted_database_should_work_correctly() {
+    // given
+    val passphrase = databaseEncryptor.passphrase
+
+    assertThat(databaseEncryptor.databaseState(DB_NAME)).isEqualTo(DOES_NOT_EXIST)
+
+    val encryptedDatabase = Room.databaseBuilder(appContext, AppDatabase::class.java, DB_NAME)
+        .allowMainThreadQueries()
+        .addTypeConverter(BaseComponentData.RoomTypeConverter(moshi))
+        .openHelperFactory(SupportFactory(passphrase, null, false))
+        .build()
+
+    val expectedUser = TestData.loggedInUser(
+        uuid = UUID.fromString("37f596b3-9bef-4778-9006-222d062e127a"),
+        name = "Ramesh Murthy",
+        createdAt = Instant.parse("2018-01-01T00:00:00Z"),
+        updatedAt = Instant.parse("2018-01-01T00:00:00Z"),
+        status = UserStatus.ApprovedForSyncing,
+        loggedInStatus = User.LoggedInStatus.LOGGED_IN
+    )
+
+    encryptedDatabase.userDao().createOrUpdate(expectedUser)
+
+    val encryptedUser = encryptedDatabase.userDao().userImmediate()
+
+    assertThat(encryptedUser).isNotNull()
+    assertThat(encryptedUser).isEqualTo(expectedUser)
+
+    encryptedDatabase.close()
+
+    assertThat(databaseEncryptor.databaseState(DB_NAME)).isEqualTo(ENCRYPTED)
+
+    // when
+    databaseEncryptor.execute(databaseName = DB_NAME, false)
+
+    // then
+    assertThat(databaseEncryptor.databaseState(DB_NAME)).isEqualTo(UNENCRYPTED)
+
+    val decryptedDatabase = Room.databaseBuilder(appContext, AppDatabase::class.java, DB_NAME)
+        .allowMainThreadQueries()
+        .addTypeConverter(BaseComponentData.RoomTypeConverter(moshi))
+        .build()
+
+    val decryptedUser = decryptedDatabase.userDao().userImmediate()
+
+    assertThat(decryptedUser).isNotNull()
+    assertThat(decryptedUser).isEqualTo(expectedUser)
   }
 }

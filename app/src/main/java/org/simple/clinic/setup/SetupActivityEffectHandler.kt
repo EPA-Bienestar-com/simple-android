@@ -70,15 +70,15 @@ class SetupActivityEffectHandler @AssistedInject constructor(
         .addTransformer(CheckIfAppCanRun::class.java, checkApplicationAllowedToRun())
         .addTransformer(SaveCountryAndDeployment::class.java, saveCountryAndDeployment())
         .addTransformer(DeleteStoredCountryV1::class.java, deleteStoredCountryV1())
-        .addTransformer(ExecuteDatabaseEncryption::class.java, executeDatabaseEncryption())
+        .addTransformer(ExecuteDatabaseEncryptionDecryption::class.java, executeDatabaseEncryption())
         .build()
   }
 
-  private fun executeDatabaseEncryption(): ObservableTransformer<ExecuteDatabaseEncryption, SetupActivityEvent> {
+  private fun executeDatabaseEncryption(): ObservableTransformer<ExecuteDatabaseEncryptionDecryption, SetupActivityEvent> {
     return ObservableTransformer { effects ->
       effects
           .observeOn(schedulersProvider.io())
-          .doOnNext { databaseEncryptor.execute(DATABASE_NAME) }
+          .doOnNext { databaseEncryptor.execute(DATABASE_NAME, it.isDatabaseEncryptionEnabled) }
           .map { DatabaseEncryptionFinished }
     }
   }

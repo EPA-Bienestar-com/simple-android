@@ -27,8 +27,10 @@ object CheckIfAppCanRun : SetupActivityEffect()
 data class SaveCountryAndDeployment(
     val country: Country,
     val deployment: Deployment
-): SetupActivityEffect()
+) : SetupActivityEffect()
 
 object DeleteStoredCountryV1 : SetupActivityEffect()
 
-object ExecuteDatabaseEncryption : SetupActivityEffect()
+data class ExecuteDatabaseEncryptionDecryption(
+    val isDatabaseEncryptionEnabled: Boolean
+) : SetupActivityEffect()

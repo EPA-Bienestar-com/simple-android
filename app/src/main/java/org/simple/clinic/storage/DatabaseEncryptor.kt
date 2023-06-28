@@ -4,13 +4,12 @@ import android.app.Application
 import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
-import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.PublishSubject
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteStatement
 import org.simple.clinic.di.AppScope
 import org.simple.clinic.storage.DatabaseEncryptor.State.ENCRYPTED
+import org.simple.clinic.storage.DatabaseEncryptor.State.UNENCRYPTED
 import org.simple.clinic.storage.SharedPreferencesMode.Mode.Encrypted
 import java.io.File
 import java.io.FileNotFoundException
@@ -26,6 +25,7 @@ class DatabaseEncryptor @Inject constructor(
 
   companion object {
     private const val PASSPHRASE_PREF_KEY = "simple_passphrase"
+    private const val ENCRYPTED_STATUS_PREF_KEY = "simple_encryption_status"
   }
 
   enum class State {
@@ -34,22 +34,25 @@ class DatabaseEncryptor @Inject constructor(
 
   val passphrase: ByteArray get() = getSecurePassphrase() ?: generateSecurePassphrase()
 
-  private val databaseEncryptionState = BehaviorSubject.create<State>()
-  val isDatabaseEncrypted: Observable<Boolean> = databaseEncryptionState
-      .map { it == ENCRYPTED }
-      .distinctUntilChanged()
+  val databaseEncryptionState = BehaviorSubject.create<State>()
+  val isDatabaseEncrypted: Boolean = getEncryptionStatusFromLocalStorage()
 
   init {
     SQLiteDatabase.loadLibs(appContext)
   }
 
-  fun execute(databaseName: String) {
+  fun execute(databaseName: String, encryptDatabase: Boolean) {
     val databaseState = databaseState(databaseName)
     databaseEncryptionState.onNext(databaseState)
 
-    if (databaseState == State.UNENCRYPTED) {
+    if (databaseState == UNENCRYPTED && encryptDatabase) {
       encrypt(databaseName)
+      updateEncryptionStatusInLocalStorage(true)
       databaseEncryptionState.onNext(ENCRYPTED)
+    } else if (databaseState == ENCRYPTED && !encryptDatabase) {
+      decrypt(databaseName)
+      updateEncryptionStatusInLocalStorage(false)
+      databaseEncryptionState.onNext(UNENCRYPTED)
     }
   }
 
@@ -80,6 +83,7 @@ class DatabaseEncryptor @Inject constructor(
       db.close()
       db = SQLiteDatabase.openDatabase(newFile.absolutePath, passphrase, null, SQLiteDatabase.OPEN_READWRITE, null, null)
 
+      //language=text
       val st: SQLiteStatement = db.compileStatement("ATTACH DATABASE ? AS plaintext KEY ''")
       st.bindString(1, databasePath.absolutePath)
       st.execute()
@@ -89,6 +93,51 @@ class DatabaseEncryptor @Inject constructor(
       db.version = version
 
       st.close()
+      db.close()
+
+      databasePath.delete()
+      newFile.renameTo(databasePath)
+    } else {
+      throw FileNotFoundException(databasePath.absolutePath + " not found")
+    }
+  }
+
+  /**
+   * Replaces this database with a decrypted version, deleting the original
+   * encrypted database. Do not call this while the database is open, which
+   * includes during any Room migrations.
+   *
+   * The passphrase is untouched in this call. Please set all bytes of the
+   * passphrase to 0 or something to clear out the passphrase if you are done
+   * with it.
+   *
+   * @param databasePath: a File pointing to the database
+   * @throws IOException
+   */
+  @Throws(IOException::class)
+  private fun decrypt(databaseName: String) {
+    val databasePath = appContext.getDatabasePath(databaseName)
+    if (databasePath.exists()) {
+      val newFile = File.createTempFile("simple_database_encryption", "tmp", appContext.cacheDir)
+      var db = SQLiteDatabase.openDatabase(databasePath.absolutePath,
+          passphrase, null, SQLiteDatabase.OPEN_READWRITE, null, null)
+
+      //language=text
+      val st: SQLiteStatement = db.compileStatement("ATTACH DATABASE ? AS plaintext KEY ''")
+      st.bindString(1, newFile.absolutePath)
+      st.execute()
+
+      db.rawExecSQL("SELECT sqlcipher_export('plaintext')")
+      db.rawExecSQL("DETACH DATABASE plaintext")
+      val version = db.version
+      db.version = version
+
+      st.close()
+      db.close()
+
+      db = SQLiteDatabase.openDatabase(newFile.absolutePath, "",
+          null, SQLiteDatabase.OPEN_READWRITE)
+      db.version = version
       db.close()
 
       databasePath.delete()
@@ -117,7 +166,7 @@ class DatabaseEncryptor @Inject constructor(
         db = SQLiteDatabase.openDatabase(databasePath.absolutePath, "",
             null, SQLiteDatabase.OPEN_READONLY)
         db.version
-        State.UNENCRYPTED
+        UNENCRYPTED
       } catch (e: Exception) {
         ENCRYPTED
       } finally {
@@ -142,5 +191,15 @@ class DatabaseEncryptor @Inject constructor(
     }
 
     return passphrase
+  }
+
+  private fun updateEncryptionStatusInLocalStorage(isEncrypted: Boolean) {
+    sharedPreferences.edit(commit = true) {
+      putBoolean(ENCRYPTED_STATUS_PREF_KEY, isEncrypted)
+    }
+  }
+
+  private fun getEncryptionStatusFromLocalStorage(): Boolean {
+    return sharedPreferences.getBoolean(ENCRYPTED_STATUS_PREF_KEY, false)
   }
 }

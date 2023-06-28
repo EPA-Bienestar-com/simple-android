@@ -13,6 +13,7 @@ import com.datadog.android.rum.RumMonitor
 import com.datadog.android.rum.tracking.FragmentViewTrackingStrategy
 import com.datadog.android.tracing.AndroidTracer
 import io.opentracing.util.GlobalTracer
+import io.reactivex.Observable
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import org.simple.clinic.activity.CloseActivitiesWhenUserIsUnauthorized
@@ -73,7 +74,6 @@ abstract class ClinicApp : Application(), CameraXConfig.Provider {
 
   protected open val crashReporterSinks = emptyList<CrashReporter.Sink>()
 
-  @SuppressLint("RestrictedApi", "CheckResult")
   override fun onCreate() {
     super.onCreate()
 
@@ -81,19 +81,14 @@ abstract class ClinicApp : Application(), CameraXConfig.Provider {
     appComponent.inject(this)
 
     if (features.isEnabled(Feature.DatabaseEncryption)) {
-      databaseEncryptor
-          .isDatabaseEncrypted
-          .filterTrue()
-          .subscribeOn(schedulersProvider.ui())
-          .subscribe {
-            updateInfrastructureUserDetails.track()
-            updateAnalyticsUserId.listen()
-            closeActivitiesWhenUserIsUnauthorized.listen()
-          }
+      databaseEncryptor.databaseEncryptionState
+          .subscribeToListeners(DatabaseEncryptor.State.ENCRYPTED)
+    } else if (features.isDisabled(Feature.DatabaseEncryption) &&
+        databaseEncryptor.isDatabaseEncrypted) {
+      databaseEncryptor.databaseEncryptionState
+          .subscribeToListeners(DatabaseEncryptor.State.UNENCRYPTED)
     } else {
-      updateInfrastructureUserDetails.track()
-      updateAnalyticsUserId.listen()
-      closeActivitiesWhenUserIsUnauthorized.listen()
+      updateListeners()
     }
 
     crashReporterSinks.forEach(CrashReporter::addSink)
@@ -114,6 +109,24 @@ abstract class ClinicApp : Application(), CameraXConfig.Provider {
     SqlPerformanceReporter.addSink(DatadogSqlPerformanceReportingSink())
 
     registerActivityLifecycleCallbacks(closeActivitiesWhenUserIsUnauthorized)
+  }
+
+  @SuppressLint("CheckResult")
+  private fun Observable<DatabaseEncryptor.State>.subscribeToListeners(desiredState: DatabaseEncryptor.State) {
+    this
+        .map { it == desiredState }
+        .distinctUntilChanged()
+        .filterTrue()
+        .subscribeOn(schedulersProvider.ui())
+        .subscribe {
+          updateListeners()
+        }
+  }
+
+  private fun updateListeners() {
+    updateInfrastructureUserDetails.track()
+    updateAnalyticsUserId.listen()
+    closeActivitiesWhenUserIsUnauthorized.listen()
   }
 
   private fun setupApplicationPerformanceMonitoring() {
