@@ -18,6 +18,8 @@ import org.simple.clinic.storage.text.TextRecord
 import org.simple.clinic.storage.text.TextStoreModule
 import org.simple.clinic.summary.PatientSummaryModule
 import org.simple.clinic.user.User
+import org.simple.clinic.util.room.DatabaseTransactionRunner
+import org.simple.sharedTestCode.util.room.TestDatabaseTransactionRunner
 
 @Module(includes = [
   RoomMigrationsModule::class,
@@ -59,4 +61,7 @@ class TestStorageModule {
 
   @Provides
   fun providePatientSearchDao(appDatabase: AppDatabase): PatientSearchResult.RoomDao = appDatabase.patientSearchDao()
+
+  @Provides
+  fun providesDatabaseTransactionRunner(): DatabaseTransactionRunner = TestDatabaseTransactionRunner
 }

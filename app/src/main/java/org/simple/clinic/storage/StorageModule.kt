@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.room.Room
 import androidx.room.migration.Migration
 import com.squareup.moshi.Moshi
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import io.requery.android.database.sqlite.SQLiteGlobal
@@ -12,18 +13,22 @@ import org.simple.clinic.AppDatabase
 import org.simple.clinic.DATABASE_NAME
 import org.simple.clinic.di.AppScope
 import org.simple.clinic.questionnaire.component.BaseComponentData
+import org.simple.clinic.storage.StorageModule.StorageModuleBinds
 import org.simple.clinic.storage.migrations.RoomMigrationsModule
 import org.simple.clinic.storage.text.TextRecord
 import org.simple.clinic.storage.text.TextStoreModule
 import org.simple.clinic.user.User
 import org.simple.clinic.util.ThreadPools
+import org.simple.clinic.util.room.DatabaseTransactionRunner
+import org.simple.clinic.util.room.RoomTransactionRunner
 
 @Module(includes = [
   RoomMigrationsModule::class,
   SharedPreferencesModule::class,
   TextStoreModule::class,
   SqliteModule::class,
-  EncryptionModule::class
+  EncryptionModule::class,
+  StorageModuleBinds::class
 ])
 class StorageModule {
 
@@ -61,4 +66,11 @@ class StorageModule {
 
   @Provides
   fun provideTextStoreDao(appDatabase: AppDatabase): TextRecord.RoomDao = appDatabase.textRecordDao()
+
+  @Module
+  interface StorageModuleBinds {
+
+    @Binds
+    fun bindsDatabaseTransactionRunner(roomTransactionRunner: RoomTransactionRunner): DatabaseTransactionRunner
+  }
 }
