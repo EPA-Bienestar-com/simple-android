@@ -28,6 +28,7 @@ import org.simple.sharedTestCode.uuid.FakeUuidGenerator
 import org.simple.clinic.widgets.UiEvent
 import org.simple.clinic.widgets.ageanddateofbirth.UserInputDateValidator
 import org.simple.mobius.migration.MobiusTestFixture
+import org.simple.sharedTestCode.util.room.TestDatabaseTransactionRunner
 import java.time.LocalDate
 import java.time.ZoneOffset.UTC
 import java.time.format.DateTimeFormatter
@@ -174,9 +175,9 @@ class BloodPressureValidationTest {
         userClock = testUserClock,
         schedulersProvider = TestSchedulersProvider.trampoline(),
         uuidGenerator = FakeUuidGenerator.fixed(UUID.fromString("abb04673-6ec0-4e1a-a4ad-5380e6f7e233")),
-        currentUser = { user },
-        currentFacility = { facility }
-    ).build()
+        databaseTransactionRunner = TestDatabaseTransactionRunner,
+        currentUser = { user }
+    ) { facility }.build()
 
     fixture = MobiusTestFixture(
         uiEvents.ofType(),

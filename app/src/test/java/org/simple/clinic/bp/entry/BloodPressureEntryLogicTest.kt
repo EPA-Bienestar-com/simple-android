@@ -49,6 +49,7 @@ import org.simple.clinic.widgets.UiEvent
 import org.simple.clinic.widgets.ageanddateofbirth.UserInputDateValidator
 import org.simple.clinic.widgets.ageanddateofbirth.UserInputDateValidator.Result.Invalid.InvalidPattern
 import org.simple.mobius.migration.MobiusTestFixture
+import org.simple.sharedTestCode.util.room.TestDatabaseTransactionRunner
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset.UTC
@@ -1025,9 +1026,9 @@ class BloodPressureEntrySheetLogicTest {
         userClock = testUserClock,
         schedulersProvider = TestSchedulersProvider.trampoline(),
         uuidGenerator = FakeUuidGenerator.fixed(measurementUuid),
-        currentUser = { user },
-        currentFacility = { facility }
-    ).build()
+        databaseTransactionRunner = TestDatabaseTransactionRunner,
+        currentUser = { user }
+    ) { facility }.build()
 
     fixture = MobiusTestFixture(
         uiEvents.ofType(),

@@ -8,6 +8,7 @@ import org.simple.sharedTestCode.TestData
 import org.simple.clinic.mobius.EffectHandlerTestCase
 import org.simple.sharedTestCode.util.TestUserClock
 import org.simple.clinic.util.scheduler.TestSchedulersProvider
+import org.simple.sharedTestCode.util.room.TestDatabaseTransactionRunner
 import java.time.LocalDate
 import java.time.ZoneOffset.UTC
 import java.util.UUID
@@ -32,9 +33,9 @@ class BloodPressureEntryEffectHandlerTest {
       userClock = userClock,
       schedulersProvider = TestSchedulersProvider.trampoline(),
       uuidGenerator = mock(),
-      currentUser = { user },
-      currentFacility = { facility }
-  ).build()
+      databaseTransactionRunner = TestDatabaseTransactionRunner,
+      currentUser = { user }
+  ) { facility }.build()
 
   private val testCase = EffectHandlerTestCase(effectHandler)
 

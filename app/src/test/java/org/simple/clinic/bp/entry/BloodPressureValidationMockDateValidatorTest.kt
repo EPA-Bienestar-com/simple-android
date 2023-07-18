@@ -33,6 +33,7 @@ import org.simple.clinic.widgets.ageanddateofbirth.UserInputDateValidator
 import org.simple.clinic.widgets.ageanddateofbirth.UserInputDateValidator.Result
 import org.simple.clinic.widgets.ageanddateofbirth.UserInputDateValidator.Result.Invalid.DateIsInFuture
 import org.simple.mobius.migration.MobiusTestFixture
+import org.simple.sharedTestCode.util.room.TestDatabaseTransactionRunner
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.util.UUID
@@ -189,9 +190,9 @@ class BloodPressureValidationMockDateValidatorTest {
         userClock = testUserClock,
         schedulersProvider = TestSchedulersProvider.trampoline(),
         uuidGenerator = FakeUuidGenerator.fixed(UUID.fromString("7283abf4-b718-4379-b101-46f011b5536b")),
-        currentUser = { user },
-        currentFacility = { facility }
-    ).build()
+        databaseTransactionRunner = TestDatabaseTransactionRunner,
+        currentUser = { user }
+    ) { facility }.build()
 
     fixture = MobiusTestFixture(
         uiEvents.ofType(),

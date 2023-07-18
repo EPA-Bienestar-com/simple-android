@@ -26,6 +26,7 @@ import org.simple.clinic.patient.PatientRepository
 import org.simple.clinic.user.User
 import org.simple.clinic.util.UserClock
 import org.simple.clinic.util.exhaustive
+import org.simple.clinic.util.room.DatabaseTransactionRunner
 import org.simple.clinic.util.scheduler.SchedulersProvider
 import org.simple.clinic.util.toLocalDateAtZone
 import org.simple.clinic.util.toUtcInstant
@@ -45,6 +46,7 @@ class BloodPressureEntryEffectHandler @AssistedInject constructor(
     private val userClock: UserClock,
     private val schedulersProvider: SchedulersProvider,
     private val uuidGenerator: UuidGenerator,
+    private val databaseTransactionRunner: DatabaseTransactionRunner,
     private val currentUser: Lazy<User>,
     private val currentFacility: Lazy<Facility>
 ) {
@@ -158,11 +160,13 @@ class BloodPressureEntryEffectHandler @AssistedInject constructor(
       facility: Facility,
       createNewBpEntry: CreateNewBpEntry
   ) {
-    val createdBloodPressureMeasurement = storeNewBloodPressureMeasurement(user, facility, createNewBpEntry)
+    databaseTransactionRunner {
+      val createdBloodPressureMeasurement = storeNewBloodPressureMeasurement(user, facility, createNewBpEntry)
 
-    val entryDate = createNewBpEntry.userEnteredDate.toUtcInstant(userClock)
-    markOlderAppointmentsAsVisited(createdBloodPressureMeasurement)
-    updatePatientRecordedAtDate(createdBloodPressureMeasurement, entryDate)
+      val entryDate = createNewBpEntry.userEnteredDate.toUtcInstant(userClock)
+      markOlderAppointmentsAsVisited(createdBloodPressureMeasurement)
+      updatePatientRecordedAtDate(createdBloodPressureMeasurement, entryDate)
+    }
   }
 
   private fun markOlderAppointmentsAsVisited(bloodPressureMeasurement: BloodPressureMeasurement) {
