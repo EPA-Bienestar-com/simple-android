@@ -4,6 +4,18 @@
 
 ### Internal
 
+- Bump Room metadata generator to v2.0.1
+
+## 2023-09-01-8855
+
+### Internal
+
+- Use raw SQL queries for UPDATE & DELETE queries that use multiple IDs as param
+
+## 2023-08-28-8850
+
+### Internal
+
 - Add missing SQLCipher proguard rules for R8
 - Add minimum memory checker to run database encryption
 - Bump AGP to v8.1.1
